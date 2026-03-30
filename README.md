@@ -18,6 +18,64 @@ DeepTeam provides the original attack strategy and framework foundations. This r
 - Support multiple providers (OpenAI, Together, Anthropic, Ollama, Azure-compatible)
 - Export run data to XLSX/JSON
 
+## Architecture map
+
+```text
+┌──────────────────────────────────────────────────────────────────────┐
+│                           Frontend (Vite)                           │
+│                   React + TypeScript + Tailwind CSS                 │
+│                                                                      │
+│  SetupPanel  LiveRunPanel  ReviewPanel  ExportPanel                 │
+└───────────────────────────────┬──────────────────────────────────────┘
+                                │
+                     HTTP + WebSocket (/api/*)
+                                │
+┌───────────────────────────────▼──────────────────────────────────────┐
+│                        Backend API (FastAPI)                         │
+│                                                                      │
+│  REST routes: start/pause/resume/cancel/result/export               │
+│  WS route: /api/ws/run (streams run_started/turn_completed/etc.)    │
+└───────────────────────────────┬──────────────────────────────────────┘
+                                │
+┌───────────────────────────────▼──────────────────────────────────────┐
+│                        Crescendo Engine Core                         │
+│                                                                      │
+│  - Multi-turn escalation loop                                        │
+│  - Refusal + eval judging                                            │
+│  - Backtracking + memory branching                                   │
+│  - Turn transcript normalization                                     │
+└───────────────────────┬───────────────────────────────┬──────────────┘
+                        │                               │
+         ┌──────────────▼──────────────┐   ┌────────────▼──────────────┐
+         │      Provider Adapters      │   │      Export Pipeline       │
+         │  OpenAI / Together / etc.   │   │   XLSX + JSON generation   │
+         └──────────────────────────────┘   └────────────────────────────┘
+```
+
+## Tech stack
+
+### Frontend
+- **React 19** + **TypeScript** (UI and app state)
+- **Vite 6** (dev server and build pipeline)
+- **Tailwind CSS** (styling and design system)
+- Native browser WebSocket API (live run streaming)
+
+### Backend
+- **Python 3** + **FastAPI** (REST + WebSocket API)
+- **Uvicorn** (ASGI server)
+- **Pydantic / pydantic-settings** (request/response/config validation)
+- **python-dotenv** (env loading)
+
+### Model/provider integration
+- **OpenAI SDK** (OpenAI/Azure-compatible endpoints)
+- **Together AI** via OpenAI-compatible endpoint
+- **Anthropic SDK**
+- **httpx** for Ollama/local HTTP integrations
+
+### Export + testing
+- **openpyxl** (XLSX workbook export)
+- **pytest** + **pytest-asyncio** (backend tests)
+
 ## Export contents (XLSX)
 
 The XLSX export includes 4 sheets:
