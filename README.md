@@ -2,6 +2,27 @@
 
 Standalone UI + API app for running multi-turn Crescendo-style attack simulations and exporting run results.
 
+## What is the Crescendo jailbreak?
+
+**Crescendo** is a multi-turn jailbreak against large language models (LLMs). It does not ask for disallowed content in the first message. Instead it **ramps the conversation** from harmless topics toward a prohibited goal. The method was introduced by Microsoft researchers in [*The Crescendo Multi-Turn LLM Jailbreak Attack*](https://arxiv.org/abs/2404.01833) (arXiv:2404.01833, April 2024) and presented at **USENIX Security 2025** ([conference site](https://www.usenix.org/conference/usenixsecurity25)). A [dedicated project page](https://crescendo-the-multiturn-jailbreak.github.io) summarizes the work.
+
+Crescendo leans on two tendencies in chat models: they follow **coherent dialogue**, and they weight **recent text** heavily—**including their own prior outputs**. That lets each turn build on what the model already said.
+
+**Typical attack flow**
+
+1. **Start benign** — Open with a harmless, on-topic question (e.g., history or education) related to the eventual target.
+2. **Escalate gradually** — Each later turn references earlier answers and nudges slightly closer to the goal.
+3. **Backtrack if refused** — If the model pushes back, soften the prompt and retry from a weaker angle.
+4. **Use the model’s words** — Pivot using phrases the model already produced as a foothold for the next step.
+
+In the paper’s setting, jailbreaks often succeed in **fewer than five** interactions, with a **cap of ten** rounds. Because language stays ordinary, the attack can slip past detectors aimed at weird tokens, symbol stuffing, or obvious toxic keywords. It does not require model weights or internals—only **steered conversation**.
+
+**Crescendomation** is an automated form: a **second LLM** writes and refines the escalating prompts. On AdvBench, the authors report large gains over other strong jailbreak baselines—for example roughly **29–61%** on GPT‑4 and **49–71%** on Gemini Pro—and **100%** success on some evaluated tasks (e.g., election misinformation scenarios).
+
+**Models evaluated in the paper** (all reported successfully jailbroken in their experiments) include ChatGPT (GPT‑4), Gemini Pro and Ultra, LLaMA‑2 70B Chat, LLaMA‑3 70B Chat, and Anthropic Claude.
+
+For a security- and mitigations-oriented angle, a **representation-engineering** follow-up ([arXiv:2507.02956](https://arxiv.org/abs/2507.02956)) studies *why* Crescendo works: attacker turns can keep internal activations in a **benign-looking** region of representation space while still steering toward harmful completions.
+
 ## Credits
 
 This project is based on and inspired by the Crescendo multi-turn attack implementation in DeepTeam:
