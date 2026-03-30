@@ -1,0 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-dynamo-text;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-semibold;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 text-sm font-semibold text-white bg-dynamo-purple rounded-lg
+           hover:bg-dynamo-violet transition-colors shadow-sm disabled:bg-gray-300
+           disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 text-sm font-medium text-dynamo-text bg-white border border-gray-200
+           rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50
+           disabled:cursor-not-allowed;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-card border border-gray-100 p-6;
+  }
+
+  .input-field {
+    @apply w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-dynamo-text
+           placeholder:text-gray-400 focus:ring-2 focus:ring-dynamo-purple/30
+           focus:border-dynamo-purple outline-none transition;
+  }
+
+  .section-label {
+    @apply text-xs font-semibold text-dynamo-muted uppercase tracking-wider mb-3;
+  }
+}

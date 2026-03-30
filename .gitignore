@@ -1,0 +1,35 @@
+# OS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Environment files (keep only template)
+.env
+.env.*
+*.env
+!.env.example
+
+# Node / frontend
+src/frontend/node_modules/
+src/frontend/dist/
+
+# Build / logs
+*.log
+dist/
+build/
+
+# Local tooling
+.cursor/
+
+# Source reference and working docs not needed in app repo
+deepteam/
+agentic-coding-markdown-instruction-set/
