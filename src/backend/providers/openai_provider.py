@@ -4,6 +4,7 @@ import asyncio
 import json
 import logging
 import os
+import re
 import time
 from typing import Any, Optional
 
@@ -12,6 +13,22 @@ from pydantic import BaseModel
 from src.backend.providers.base import BaseProvider
 
 logger = logging.getLogger(__name__)
+
+
+def _is_non_retryable_openai(exc: Exception) -> bool:
+    """Return True for OpenAI errors that will fail identically on every retry."""
+    status = getattr(exc, "status_code", None) or getattr(exc, "code", None)
+    if status in (400, 401, 403):
+        return True
+    msg = str(exc)
+    if re.search(
+        r"context.length|maximum.context.length|token.limit|"
+        r"authentication|unauthorized|forbidden|invalid.api.key",
+        msg,
+        re.IGNORECASE,
+    ):
+        return True
+    return False
 
 
 class OpenAIProvider(BaseProvider):
@@ -62,6 +79,9 @@ class OpenAIProvider(BaseProvider):
                 return response.choices[0].message.content or ""
             except Exception as exc:
                 last_error = exc
+                if _is_non_retryable_openai(exc):
+                    logger.error("OpenAI generation hit non-retryable error: %s", exc)
+                    break
                 if attempt < self.max_retries - 1:
                     sleep_time = 2**attempt
                     logger.warning(
@@ -103,6 +123,9 @@ class OpenAIProvider(BaseProvider):
                 return schema(**data)
             except Exception as exc:
                 last_error = exc
+                if _is_non_retryable_openai(exc):
+                    logger.error("OpenAI structured generation hit non-retryable error: %s", exc)
+                    break
                 if attempt < self.max_retries - 1:
                     sleep_time = 2**attempt
                     logger.warning(
